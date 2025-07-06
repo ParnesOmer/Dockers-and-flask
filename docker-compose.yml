@@ -1,0 +1,73 @@
+services:
+  router:
+    build: ./router
+    container_name: router
+    image: router-app
+    ports:
+      - "5000:5000"
+    networks:
+      - executors-net
+    depends_on:
+      - java-executor
+      - python-executor
+      - dart-executor
+    volumes:
+      - ./logs:/app/logs
+
+
+
+  python-executor:
+    build: ./python-executor
+    container_name: python
+    image: python-executor
+    ports:
+      - "5001:5001"
+    networks:
+      - executors-net
+    volumes:
+      - ./logs:/app/logs
+
+
+  java-executor:
+    build: ./java-executor
+    container_name: java
+    image: java-executor
+    ports:
+      - "5002:5002"
+    networks:
+      - executors-net
+    volumes:
+      - ./logs:/app/logs
+
+  dart-executor:
+    build:
+      context: ./dart-executor
+      dockerfile: Dockerfile
+    container_name: dart
+    image: dart-executor
+    ports:
+      - "5003:5003"
+    networks:
+      - executors-net
+    volumes:
+      - ./logs:/app/logs
+
+  client:
+    build: ./client
+    container_name: client
+    image: client-app
+    ports:
+      - "5004:5004"
+    networks:
+      - executors-net
+    depends_on:
+      - router
+    environment:
+      - ROUTER_URL=http://router:5000
+
+
+networks:
+  executors-net:
+    driver: bridge
+    # Optionally, you can define additional networks or configurations here
+
